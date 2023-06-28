@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Text Decryption</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container mt-3">
+        <div class="alert alert-dismissible alert-success">
+            <strong>DECRYPT</strong> uses 256bit decryption algorithm.
+        </div>
+        <h4 class="text-center">Text Decryption</h4>
+
+        <div class="form-group">
+            <label for="textToDecrypt">Text to Decrypt:</label>
+            <textarea placeholder="Enter The Encrypted Text" class="form-control" id="textToDecrypt"
+                rows="3"></textarea>
+        </div>
+
+        <div class="form-group position-relative">
+            <label for="decryptionKey">Decryption Key (6 characters):</label>
+            <div class="input-group">
+                <input placeholder="Enter The Encrypted Password" type="password" class="form-control"
+                    id="decryptionKey" maxlength="6">
+                <div class="input-group-append">
+                    <span class="input-group-text password-icon" id="togglePassword">
+                        <i class="fa fa-eye-slash"></i>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <button class="btn btn-primary btn-block" onclick="decryptText()"><i class="fa fa-lock-open"></i>&nbsp;
+                Decrypt</button>
+        </div>
+
+        <div class="alert alert-danger" id="errorAlert" style="display: none;"></div>
+
+        <div class="result mt-3">
+            <h6>Decrypted Text:</h6>
+            <textarea placeholder="Decrypted Text" class="form-control" id="decryptedText" rows="2" readonly></textarea>
+        </div>
+        <div class="container text-center mt-3">
+            <button class="btn btn-primary" onclick="downloadDecryptedText()"><i class="fa fa-download"></i>&nbsp;
+                Download Decrypted Text</button>
+        </div>
+        <div class="container text-center mt-3">
+            <a class="btn btn-primary" href="encryption.html"><i class="fa fa-arrow-left"></i>&nbsp; Go to
+                Encryption</a>
+        </div>
+    </div>
+    <footer class="text-center mt-3">
+        <p>Made with <i class="fas fa-heart text-danger"></i>&nbsp;<a href="#">Vishnu Venkat.G</a></p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        function downloadDecryptedText() {
+            var decryptedText = document.getElementById("decryptedText").value;
+            if (decryptedText) {
+                var element = document.createElement("a");
+                element.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(decryptedText));
+                element.setAttribute("download", "decrypted_text.txt");
+                element.style.display = "none";
+                document.body.appendChild(element);
+                element.click();
+                document.body.removeChild(element);
+            }
+        }
+        $(document).ready(function () {
+            $("#togglePassword").click(function () {
+                var passwordInput = $("#decryptionKey");
+                var passwordIcon = $("#togglePassword i");
+
+                if (passwordInput.attr("type") === "password") {
+                    passwordInput.attr("type", "text");
+                    passwordIcon.removeClass("fa-eye-slash").addClass("fa-eye");
+                } else {
+                    passwordInput.attr("type", "password");
+                    passwordIcon.removeClass("fa-eye").addClass("fa-eye-slash");
+                }
+            });
+        });
+
+        function decryptText() {
+            var textToDecrypt = document.getElementById("textToDecrypt").value;
+            var decryptionKey = document.getElementById("decryptionKey").value;
+
+            if (decryptionKey.length !== 6) {
+                displayError("Decryption key must be 6 characters.");
+                return;
+            }
+
+            if (!textToDecrypt || !decryptionKey) {
+                displayError("Please enter both text and decryption key.");
+                return;
+            }
+
+            var decryptedText = decrypt(textToDecrypt, decryptionKey);
+
+            if (decryptedText === "") {
+                displayError("Wrong decryption key.");
+                return;
+            }
+
+            document.getElementById("decryptedText").value = decryptedText;
+            hideError();
+        }
+
+        function decrypt(ciphertext, key) {
+            try {
+                var bytes = CryptoJS.AES.decrypt(ciphertext, key);
+                return bytes.toString(CryptoJS.enc.Utf8);
+            } catch (error) {
+                return "";
+            }
+        }
+
+        function displayError(errorMessage) {
+            var errorAlert = document.getElementById("errorAlert");
+            errorAlert.style.display = "block";
+            errorAlert.innerHTML = errorMessage;
+        }
+
+        function hideError() {
+            var errorAlert = document.getElementById("errorAlert");
+            errorAlert.style.display = "none";
+            errorAlert.innerHTML = "";
+        }
+    </script>
+    <!-- Add this script tag before the closing </body> tag -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+</body>
+
+</html>

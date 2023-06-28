@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Text Encryption</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container mt-3">
+        <div class="alert alert-success">
+            <strong>ENCRYPT</strong> uses 256bit encryption algorithm.
+        </div>
+        <h4 class="text-center">Text Encryption</h4>
+
+        <div class="form-group">
+            <label for="textToEncrypt">Text to Encrypt:</label>
+            <textarea placeholder="Enter The Text" class="form-control" id="textToEncrypt" rows="3"></textarea>
+        </div>
+
+        <div class="form-group position-relative">
+            <label for="encryptionKey">Encryption Key (6 characters):</label>
+            <div class="input-group">
+                <input placeholder="Enter The Password" type="password" class="form-control" id="encryptionKey" maxlength="6">
+                <div class="input-group-append">
+                    <span class="input-group-text password-icon" id="togglePassword">
+                        <i class="fa fa-eye-slash"></i>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <button class="btn btn-secondary btn-sm" onclick="generateRandomPassword()">Generate Random
+                Password &nbsp; <i class="fa fa-random"></i></button>
+        </div>
+
+        <button class="btn btn-primary btn-block" onclick="encryptText()"><i class="fa fa-lock"></i>&nbsp; Encrypt</button>
+
+        <div class="alert alert-danger mt-3" id="errorAlert" style="display: none;"></div>
+
+        <div class="result mt-3">
+            <h6>Encrypted Text:</h6>
+            <textarea placeholder="Encrypted Text" class="form-control" id="encryptedText" rows="2" readonly></textarea>
+        </div>
+
+        <div class="container text-center mt-3">
+            <a class="btn btn-primary" href="decryption.html"><i class="fa fa-arrow-right"></i>&nbsp; Go to Decryption</a>
+        </div>
+    </div>
+
+   <footer class="text-center mt-3">
+        <p>Made with <i class="fas fa-heart text-danger"></i>&nbsp;<a href="#">Vishnu Venkat.G</a></p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        function generateRandomPassword() {
+            var chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            var password = "";
+            for (var i = 0; i < 6; i++) {
+                password += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            document.getElementById("encryptionKey").value = password;
+        }
+
+        $(document).ready(function () {
+            $("#togglePassword").click(function () {
+                var passwordInput = $("#encryptionKey");
+                var passwordIcon = $("#togglePassword i");
+
+                if (passwordInput.attr("type") === "password") {
+                    passwordInput.attr("type", "text");
+                    passwordIcon.removeClass("fa-eye-slash").addClass("fa-eye");
+                } else {
+                    passwordInput.attr("type", "password");
+                    passwordIcon.removeClass("fa-eye").addClass("fa-eye-slash");
+                }
+            });
+        });
+
+        function encryptText() {
+            var textToEncrypt = document.getElementById("textToEncrypt").value;
+            var encryptionKey = document.getElementById("encryptionKey").value;
+
+            if (encryptionKey.length !== 6) {
+                displayError("Encryption key must be 6 characters.");
+                return;
+            }
+
+            if (!textToEncrypt || !encryptionKey) {
+                displayError("Please enter both text and encryption key.");
+                return;
+            }
+
+            var encryptedText = encrypt(textToEncrypt, encryptionKey);
+            document.getElementById("encryptedText").value = encryptedText;
+            hideError();
+        }
+
+        function encrypt(plaintext, key) {
+            return CryptoJS.AES.encrypt(plaintext, key).toString();
+        }
+
+        function displayError(errorMessage) {
+            var errorAlert = document.getElementById("errorAlert");
+            errorAlert.style.display = "block";
+            errorAlert.innerHTML = errorMessage;
+        }
+
+        function hideError() {
+            var errorAlert = document.getElementById("errorAlert");
+            errorAlert.style.display = "none";
+            errorAlert.innerHTML = "";
+        }
+    </script>
+</body>
+
+</html>
